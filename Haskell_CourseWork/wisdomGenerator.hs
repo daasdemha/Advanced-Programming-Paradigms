@@ -74,6 +74,7 @@ makeQuotes quoteListNewLine = wordsWhen (=='\n') $ removeRs quoteListNewLine
 --   ascii:           ’            “         ”            —         ī       ū      á      è         ā
 -- replaced by:     empty        (  not replace  )      space       i       u      a      e         a
 -- will replace:    yes            no        no          yes        no      no     no     no        no
+--                 Other punctuations will not be removed as dentifyQuotes can include them.
 -- ########################################################################################################
 
 -- removing ’ 
