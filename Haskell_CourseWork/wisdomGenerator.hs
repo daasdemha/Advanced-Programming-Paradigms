@@ -15,7 +15,7 @@ enteredWord = do
         putStr "enter a word in which you seek wisdom about: "
         enteredWord <- getLine
         return (enteredWord)
-                     
+
 -- ########################################################################################################
 --                                 Recursive function that prints quotes.
 -- ########################################################################################################                        
@@ -24,7 +24,7 @@ respond listToRemoveFrom = do
         -- getting index of random qoute
         generator <- getStdGen
         let randomQuoteGenerator = take 1 (randomRs (0,length  listToRemoveFrom - 1) generator)
-        print $ getRandomQuote listToRemoveFrom randomQuoteGenerator
+        putStrLn $ getRandomQuote listToRemoveFrom randomQuoteGenerator
         putStr "Would you like to seek more wisdom if availible if so type y: "
         response <- getLine
         if remove (getRandomQuote listToRemoveFrom randomQuoteGenerator) listToRemoveFrom == [] 
@@ -47,8 +47,7 @@ main = do
      contents <- readFile "WiseSayings.txt" 
      let quoteList = makeQuotes contents
      let relevantQuotes = identifyQuotes quoteList userWord
-     print $ qouteAvalible relevantQuotes
-     
+     putStrLn $ qouteAvalible relevantQuotes   
      respond relevantQuotes
 
 -- ########################################################################################################
@@ -69,6 +68,29 @@ wordsWhen p s =  case dropWhile p s of
 makeQuotes quoteListNewLine = wordsWhen (=='\n') $ removeRs quoteListNewLine
 
 -- ########################################################################################################
+--                                         Dealing with ascii.
+--                    This pocess is done here as to avoide replacing the real quotes.
+--   unicode:       \8217        \8220     \8221        \8212     \299    \363   \225   \232      \257 
+--   ascii:           ’            “         ”            —         ī       ū      á      è         ā
+-- replaced by:     empty        (  not replace  )      space       i       u      a      e         a
+-- will replace:    yes            no        no          yes        no      no     no     no        no
+-- ########################################################################################################
+
+-- removing ’ 
+removePun listToBeRemovedPunFrom = map (filter (/= '’')) listToBeRemovedPunFrom
+
+-- replacing — with a space.
+replaceSymbolWithSpace :: [Char] -> [Char]
+replaceSymbolWithSpace   [] = []
+replaceSymbolWithSpace   (h:t) =
+    if h == '—'
+      then " " ++ replaceSymbolWithSpace  t
+      else h : replaceSymbolWithSpace  t
+
+-- combining the above two.
+dealPun listToBeDealtWith = map replaceSymbolWithSpace (removePun listToBeDealtWith)
+
+-- ########################################################################################################
 --                              Getting if entered word is present in a list.
 -- ########################################################################################################
 
@@ -85,7 +107,7 @@ lowerIndexCheck listofwords = checkIndex (map (map toLower) listofwords)
 
 -- Getting lists of codes required.
 -- getting if entered word is present in a list
-identifyQuotes quoteList userWord = search (lowerIndexCheck quoteList (convertToLower userWord)) quoteList
+identifyQuotes quoteList userWord = search (lowerIndexCheck (dealPun quoteList) (convertToLower userWord)) quoteList
 
 -- checking if quote is availible
 qouteAvalible availible = if availible == []
