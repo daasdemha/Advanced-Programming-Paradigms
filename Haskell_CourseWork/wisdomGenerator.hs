@@ -64,21 +64,26 @@ wordsWhen p s =  case dropWhile p s of
                       s' -> w : wordsWhen p s''
                             where (w, s'') = break p s'
 
+-- Removing null or empty list elements if present.
+removeNullValues listToBeRemoveNullFrom = filter (not . null) listToBeRemoveNullFrom
+
 -- Makes quoted list.
-makeQuotes quoteListNewLine = wordsWhen (=='\n') $ removeRs quoteListNewLine
+makeQuotes quoteListNewLine = removeNullValues $ wordsWhen (=='\n') $ removeRs quoteListNewLine
 
 -- ########################################################################################################
 --                                         Dealing with ascii.
 --                    This pocess is done here as to avoide replacing the real quotes.
 --   unicode:       \8217        \8220     \8221        \8212     \299    \363   \225   \232      \257 
 --   ascii:           ’            “         ”            —         ī       ū      á      è         ā
--- replaced by:     empty        (  not replace  )      space       i       u      a      e         a
--- will replace:    yes            no        no          yes        no      no     no     no        no
+-- replaced by:     empty        empty      empty       space      
+-- ī       ū      á      è         ā   were left as is as they can be a persons names real spellings.
 --                 Other punctuations will not be removed as dentifyQuotes can include them.
 -- ########################################################################################################
 
--- removing ’ 
+-- removing ’ “ ”  punctuations.
 removePun listToBeRemovedPunFrom = map (filter (/= '’')) listToBeRemovedPunFrom
+removePun2 listToBeRemovedPunFrom2 = map (filter (/= '“')) listToBeRemovedPunFrom2
+removePun3 listToBeRemovedPunFrom3 = map (filter (/= '”')) listToBeRemovedPunFrom3
 
 -- replacing — with a space.
 replaceSymbolWithSpace :: [Char] -> [Char]
@@ -89,7 +94,7 @@ replaceSymbolWithSpace   (h:t) =
       else h : replaceSymbolWithSpace  t
 
 -- combining the above two.
-dealPun listToBeDealtWith = map replaceSymbolWithSpace (removePun listToBeDealtWith)
+dealPun listToBeDealtWith = map replaceSymbolWithSpace (removePun3 $ removePun2 $ removePun listToBeDealtWith)
 
 -- ########################################################################################################
 --                              Getting if entered word is present in a list.
