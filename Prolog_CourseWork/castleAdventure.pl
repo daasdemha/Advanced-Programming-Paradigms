@@ -103,7 +103,7 @@ connection(staircase, up, atrium).
 connection(staircase, right, masterBedroom).
 connection(staircase, bottom, dungeon) :- pickup(amulet, pickedup).
 connection(staircase, bottom, dungeon) :-
-        write('You Can only go to the dungeon with the amulet in hand.'), nl,
+        write('You Cannot go through walls.'), nl,
         write('
                              .--------.
                             / .------. \\
@@ -645,10 +645,17 @@ locationDetailedDescription(greatHall) :-
         '),
          nl.
 
+locationDetailedDescription(staircase) :- pickup(amulet, pickedup),
+        write('Above you is the atrium.'), nl,
+        write('On your right side is the masterBedroom.'), nl,
+        write('The amulet lights up. The wall below you slides open and there is a dark path going towrds the doungeon.'), nl.
+        
 locationDetailedDescription(staircase) :-
         write('Above you is the atrium.'), nl,
         write('On your right side is the masterBedroom.'), nl,
-        write('There is a secrete path here going down.'), nl.
+        write('There a wall below you.'), nl.
+
+
 
 locationDetailedDescription(masterBedroom) :-
         write('On your left side is the staircase.'), nl,
